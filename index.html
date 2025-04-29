@@ -42,14 +42,17 @@
     }
     .iframe-wrapper {
       width: 100%;
-      overflow: hidden;
+      position: relative;
+      padding-top: 56.25%; /* 16:9比率 (9/16 = 0.5625) */
     }
     .iframe-wrapper iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
       width: 100%;
-      height: auto;
-      transform-origin: 0 0;
-      transform: scale(1);
+      height: 100%;
       border: none;
+      transform: none;
     }
   </style>
 </head>
@@ -83,11 +86,9 @@
     function updateGridColumns() {
       const cols = columnsSelector.value;
       container.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
-      rescaleIframes();
     }
 
     columnsSelector.addEventListener('change', updateGridColumns);
-    window.addEventListener('resize', rescaleIframes);
 
     const response = await fetch('iframes.csv');
     const text = await response.text();
@@ -112,10 +113,6 @@
       const iframe = document.createElement('iframe');
       iframe.setAttribute('data-src', item.url);
 
-      iframe.onload = function() {
-        applyScale(iframe);
-      };
-
       wrapper.appendChild(iframe);
       div.appendChild(title);
       div.appendChild(wrapper);
@@ -135,28 +132,6 @@
     document.querySelectorAll('iframe[data-src]').forEach(iframe => {
       observer.observe(iframe);
     });
-
-    function applyScale(iframe) {
-      try {
-        const wrapper = iframe.parentElement;
-        const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-        const contentWidth = iframeDoc.body.scrollWidth;
-        const contentHeight = iframeDoc.body.scrollHeight;
-        const scale = wrapper.offsetWidth / contentWidth;
-        iframe.style.transform = `scale(${scale})`;
-        iframe.style.height = contentHeight * scale + 'px';
-      } catch (e) {
-        console.warn('Scaling failed (possibly cross-origin):', e);
-      }
-    }
-
-    function rescaleIframes() {
-      document.querySelectorAll('.iframe-wrapper iframe').forEach(iframe => {
-        if (iframe.complete && iframe.contentWindow) {
-          applyScale(iframe);
-        }
-      });
-    }
 
     updateGridColumns();
   });
