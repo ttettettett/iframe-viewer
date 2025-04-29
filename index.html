@@ -5,24 +5,41 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>iframe一覧ページ</title>
   <style>
-    body { margin: 0; font-family: sans-serif; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      font-family: sans-serif;
+      overflow: auto;
+    }
     .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 10px;
+      display: flex;
+      flex-direction: column;
       padding: 10px;
+      gap: 20px;
+    }
+    .item {
+      border: 1px solid #ccc;
+      padding: 10px;
+      background: #fafafa;
+    }
+    .title {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 8px;
     }
     iframe {
       width: 100%;
-      height: 200px;
-      border: 1px solid #ccc;
+      height: 400px;
+      border: none;
     }
   </style>
 </head>
 <body>
 
 <div class="grid">
-  <!-- iframeは後からJavaScriptで読み込み -->
+  <!-- タイトル＋iframeを後から読み込み -->
 </div>
 
 <script>
@@ -33,17 +50,31 @@
     const response = await fetch('iframes.csv');
     const text = await response.text();
 
-    // 改行で分割してURLリストを作成
-    const urls = text.split(/\r?\n/).filter(line => line.trim() !== "");
-
-    // iframeを動的に生成して追加
-    urls.forEach(url => {
-      const iframe = document.createElement('iframe');
-      iframe.setAttribute('data-src', url.trim());
-      container.appendChild(iframe);
+    // CSV解析（1行目はヘッダーなのでスキップ）
+    const lines = text.trim().split(/\r?\n/);
+    const data = lines.slice(1).map(line => {
+      const [title, url] = line.split(",");
+      return { title: title.trim(), url: url.trim() };
     });
 
-    // IntersectionObserverで遅延読み込み設定
+    // タイトル＋iframeを動的に生成して追加
+    data.forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'item';
+
+      const title = document.createElement('div');
+      title.className = 'title';
+      title.textContent = item.title;
+
+      const iframe = document.createElement('iframe');
+      iframe.setAttribute('data-src', item.url);
+
+      div.appendChild(title);
+      div.appendChild(iframe);
+      container.appendChild(div);
+    });
+
+    // IntersectionObserverでiframe遅延読み込み設定
     const observer = new IntersectionObserver(entries => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
