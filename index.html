@@ -32,6 +32,7 @@
       background: #fafafa;
       display: flex;
       flex-direction: column;
+      align-items: center;
     }
     .title {
       font-size: 18px;
@@ -39,9 +40,17 @@
       margin-bottom: 8px;
       text-align: center;
     }
-    iframe {
+    .iframe-wrapper {
+      position: relative;
       width: 100%;
-      height: 300px;
+      padding-top: 56.25%; /* 16:9 Aspect Ratio */
+    }
+    iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
       border: none;
     }
   </style>
@@ -92,11 +101,15 @@
       title.className = 'title';
       title.textContent = item.title;
 
+      const wrapper = document.createElement('div');
+      wrapper.className = 'iframe-wrapper';
+
       const iframe = document.createElement('iframe');
       iframe.setAttribute('data-src', item.url);
 
+      wrapper.appendChild(iframe);
       div.appendChild(title);
-      div.appendChild(iframe);
+      div.appendChild(wrapper);
       container.appendChild(div);
     });
 
