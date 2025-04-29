@@ -73,16 +73,6 @@
     <option value="9">9列</option>
     <option value="10">10列</option>
   </select>
-
-  <label for="height">高さ:</label>
-  <select id="height">
-    <option value="240">240px</option>
-    <option value="360" selected>360px</option>
-    <option value="480">480px</option>
-    <option value="600">600px</option>
-    <option value="720">720px</option>
-    <option value="900">900px</option>
-  </select>
 </div>
 
 <div class="grid">
@@ -93,33 +83,26 @@
   document.addEventListener("DOMContentLoaded", async function() {
     const container = document.querySelector('.grid');
     const columnsSelector = document.getElementById('columns');
-    const heightSelector = document.getElementById('height');
 
     function updateGrid() {
       const cols = columnsSelector.value;
-      const height = heightSelector.value;
       container.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
-      document.querySelectorAll('.iframe-wrapper').forEach(wrapper => {
-        wrapper.style.height = `${height}px`;
-      });
       rescaleIframes();
     }
 
     function rescaleIframes() {
-      document.querySelectorAll('.iframe-wrapper iframe').forEach(iframe => {
-        const wrapper = iframe.parentElement;
+      document.querySelectorAll('.iframe-wrapper').forEach(wrapper => {
         const wrapperWidth = wrapper.clientWidth;
-        const wrapperHeight = wrapper.clientHeight;
-        const scaleX = wrapperWidth / 1920;
-        const scaleY = wrapperHeight / 1080;
-        const scale = Math.min(scaleX, scaleY);
+        const wrapperHeight = wrapperWidth * 9 / 16;
+        wrapper.style.height = `${wrapperHeight}px`;
 
+        const iframe = wrapper.querySelector('iframe');
+        const scale = wrapperWidth / 1920;
         iframe.style.transform = `scale(${scale})`;
       });
     }
 
     columnsSelector.addEventListener('change', updateGrid);
-    heightSelector.addEventListener('change', updateGrid);
     window.addEventListener('resize', rescaleIframes);
 
     const response = await fetch('iframes.csv');
