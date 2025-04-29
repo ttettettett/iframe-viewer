@@ -23,28 +23,28 @@
     .grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 20px;
+      gap: 0;
       padding: 10px;
     }
     .item {
       border: 1px solid #ccc;
-      padding: 10px;
+      padding: 5px;
       background: #fafafa;
       display: flex;
       flex-direction: column;
       align-items: center;
     }
     .title {
-      font-size: 18px;
+      font-size: 12px;
       font-weight: bold;
-      margin-bottom: 8px;
+      margin-bottom: 4px;
       text-align: center;
     }
     .iframe-wrapper {
       width: 100%;
-      aspect-ratio: 16/9;
       position: relative;
       overflow: hidden;
+      aspect-ratio: 16 / 9;
     }
     .iframe-wrapper iframe {
       position: absolute;
@@ -141,6 +141,7 @@
         const wrapper = iframe.parentElement;
         const scale = wrapper.clientWidth / 1920;
         iframe.style.transform = `scale(${scale})`;
+        iframe.style.height = `${1080 * scale}px`;
       });
     }
 
