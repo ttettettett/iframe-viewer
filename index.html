@@ -41,16 +41,14 @@
       text-align: center;
     }
     .iframe-wrapper {
-      position: relative;
       width: 100%;
-      padding-top: 56.25%; /* 16:9 Aspect Ratio */
+      overflow: hidden;
     }
-    iframe {
-      position: absolute;
-      top: 0;
-      left: 0;
+    .iframe-wrapper iframe {
       width: 100%;
-      height: 100%;
+      height: auto;
+      transform-origin: 0 0;
+      transform: scale(1);
       border: none;
     }
   </style>
@@ -82,26 +80,24 @@
     const container = document.querySelector('.grid');
     const columnsSelector = document.getElementById('columns');
 
-    // 初期設定を2列に
-    container.style.gridTemplateColumns = `repeat(${columnsSelector.value}, 1fr)`;
-
-    columnsSelector.addEventListener('change', function() {
-      const cols = this.value;
+    function updateGridColumns() {
+      const cols = columnsSelector.value;
       container.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
-    });
+      rescaleIframes();
+    }
 
-    // CSVファイルからデータを取得
+    columnsSelector.addEventListener('change', updateGridColumns);
+    window.addEventListener('resize', rescaleIframes);
+
     const response = await fetch('iframes.csv');
     const text = await response.text();
 
-    // CSV解析（1行目はヘッダーなのでスキップ）
     const lines = text.trim().split(/\r?\n/);
     const data = lines.slice(1).map(line => {
       const [title, url] = line.split(",");
       return { title: title.trim(), url: url.trim() };
     });
 
-    // タイトル＋iframeを動的に生成して追加
     data.forEach(item => {
       const div = document.createElement('div');
       div.className = 'item';
@@ -116,13 +112,16 @@
       const iframe = document.createElement('iframe');
       iframe.setAttribute('data-src', item.url);
 
+      iframe.onload = function() {
+        applyScale(iframe);
+      };
+
       wrapper.appendChild(iframe);
       div.appendChild(title);
       div.appendChild(wrapper);
       container.appendChild(div);
     });
 
-    // IntersectionObserverでiframe遅延読み込み設定
     const observer = new IntersectionObserver(entries => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
@@ -136,6 +135,30 @@
     document.querySelectorAll('iframe[data-src]').forEach(iframe => {
       observer.observe(iframe);
     });
+
+    function applyScale(iframe) {
+      try {
+        const wrapper = iframe.parentElement;
+        const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+        const contentWidth = iframeDoc.body.scrollWidth;
+        const contentHeight = iframeDoc.body.scrollHeight;
+        const scale = wrapper.offsetWidth / contentWidth;
+        iframe.style.transform = `scale(${scale})`;
+        iframe.style.height = contentHeight * scale + 'px';
+      } catch (e) {
+        console.warn('Scaling failed (possibly cross-origin):', e);
+      }
+    }
+
+    function rescaleIframes() {
+      document.querySelectorAll('.iframe-wrapper iframe').forEach(iframe => {
+        if (iframe.complete && iframe.contentWindow) {
+          applyScale(iframe);
+        }
+      });
+    }
+
+    updateGridColumns();
   });
 </script>
 
