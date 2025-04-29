@@ -22,7 +22,7 @@
     }
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      grid-template-columns: repeat(2, 1fr);
       gap: 20px;
       padding: 10px;
     }
@@ -61,9 +61,15 @@
   <label for="columns">列数:</label>
   <select id="columns">
     <option value="1">1列</option>
-    <option value="2">2列</option>
+    <option value="2" selected>2列</option>
     <option value="3">3列</option>
     <option value="4">4列</option>
+    <option value="5">5列</option>
+    <option value="6">6列</option>
+    <option value="7">7列</option>
+    <option value="8">8列</option>
+    <option value="9">9列</option>
+    <option value="10">10列</option>
   </select>
 </div>
 
@@ -75,6 +81,9 @@
   document.addEventListener("DOMContentLoaded", async function() {
     const container = document.querySelector('.grid');
     const columnsSelector = document.getElementById('columns');
+
+    // 初期設定を2列に
+    container.style.gridTemplateColumns = `repeat(${columnsSelector.value}, 1fr)`;
 
     columnsSelector.addEventListener('change', function() {
       const cols = this.value;
