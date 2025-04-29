@@ -88,11 +88,11 @@
     function rescaleIframes() {
       document.querySelectorAll('.iframe-wrapper').forEach(wrapper => {
         const wrapperWidth = wrapper.clientWidth;
-        const wrapperHeight = wrapperWidth * 9 / 16;
+        const wrapperHeight = wrapperWidth * 16 / 9;
         wrapper.style.height = `${wrapperHeight}px`;
 
         const iframe = wrapper.querySelector('iframe');
-        const scale = wrapperWidth / 1920;
+        const scale = wrapperWidth / 1080;
         iframe.style.transform = `scale(${scale})`;
       });
     }
