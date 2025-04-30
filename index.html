@@ -86,11 +86,17 @@
   <button id="nextPage">次へ</button>
   <span id="pageInfo"></span>
 </div>
-
 <div class="grid"></div>
+
+<div class="controls" id="pagingBottom">
+  <button id="prevPageBottom">前へ</button>
+  <button id="nextPageBottom">次へ</button>
+</div></div>
 
 <script>
   document.addEventListener("DOMContentLoaded", async function() {
+    const prevButtonBottom = document.getElementById('prevPageBottom');
+    const nextButtonBottom = document.getElementById('nextPageBottom');
     const container = document.querySelector('.grid');
     const columnsSelector = document.getElementById('columns');
     const pageSizeSelector = document.getElementById('pageSize');
@@ -183,10 +189,28 @@
         renderPage(currentPage);
       }
     });
+    prevButtonBottom.addEventListener('click', () => {
+      if (currentPage > 0) {
+        currentPage--;
+        renderPage(currentPage);
+      }
+    });
+        renderPage(currentPage);
+      }
+    });
 
     nextButton.addEventListener('click', () => {
       if ((currentPage + 1) * pageSize < data.length) {
         currentPage++;
+        renderPage(currentPage);
+      }
+    });
+    nextButtonBottom.addEventListener('click', () => {
+      if ((currentPage + 1) * pageSize < data.length) {
+        currentPage++;
+        renderPage(currentPage);
+      }
+    });
         renderPage(currentPage);
       }
     });
