@@ -126,7 +126,7 @@
       baseScale = parseInt(scaleSelector.value);
       document.querySelectorAll('.iframe-wrapper').forEach(wrapper => {
         const wrapperWidth = wrapper.clientWidth;
-        const wrapperHeight = wrapperWidth * 16 / 9.5;
+        const wrapperHeight = wrapperWidth * 16 / 10;
         wrapper.style.height = `${wrapperHeight}px`;
 
         const iframe = wrapper.querySelector('iframe');
