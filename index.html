@@ -88,9 +88,9 @@
 </div>
 <div class="grid"></div>
 
-<div class="controls" id="pagingBottom">
-  <button id="prevPageBottom">前へ</button>
-  <button id="nextPageBottom">次へ</button>
+<div class="controls">
+  <button class="paging-button prev">前へ</button>
+  <button class="paging-button next">次へ</button>
 </div>
 
 <div class="controls" id="pagingBottom">
@@ -100,6 +100,22 @@
 
 <script>
   document.addEventListener("DOMContentLoaded", async function() {
+    document.querySelectorAll('.paging-button.prev').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (currentPage > 0) {
+          currentPage--;
+          renderPage(currentPage);
+        }
+      });
+    });
+    document.querySelectorAll('.paging-button.next').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if ((currentPage + 1) * pageSize < data.length) {
+          currentPage++;
+          renderPage(currentPage);
+        }
+      });
+    });
     const prevButtonBottom = document.getElementById('prevPageBottom');
     const nextButtonBottom = document.getElementById('nextPageBottom');
     const prevButtonBottom = document.getElementById('prevPageBottom');
@@ -107,8 +123,7 @@
     const container = document.querySelector('.grid');
     const columnsSelector = document.getElementById('columns');
     const pageSizeSelector = document.getElementById('pageSize');
-    const prevButton = document.getElementById('prevPage');
-    const nextButton = document.getElementById('nextPage');
+    
     const pageInfo = document.getElementById('pageInfo');
 
     let data = [];
@@ -190,10 +205,7 @@
       renderPage(currentPage);
     });
 
-    prevButton.addEventListener('click', () => {
-      if (currentPage > 0) {
-        currentPage--;
-        renderPage(currentPage);
+    
       }
     });
     if (prevButtonBottom) {
@@ -214,10 +226,7 @@
       }
     });
 
-    nextButton.addEventListener('click', () => {
-      if ((currentPage + 1) * pageSize < data.length) {
-        currentPage++;
-        renderPage(currentPage);
+    
       }
     });
     if (nextButtonBottom) {
