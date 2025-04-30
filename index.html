@@ -61,6 +61,13 @@
 
 $1
     <label for="columns">列数:</label>
+  <label for="pageSize">ページサイズ:</label>
+  <select id="pageSize">
+    <option value="10">10件</option>
+    <option value="20" selected>20件</option>
+    <option value="30">30件</option>
+    <option value="50">50件</option>
+  </select>
   <select id="columns">
     <option value="1">1列</option>
     <option value="2">2列</option>
@@ -86,8 +93,9 @@ $1
   document.addEventListener("DOMContentLoaded", async function() {
     const container = document.querySelector('.grid');
     const columnsSelector = document.getElementById('columns');
-    let pageSize = 20;
-    let baseScale = 250; // 拡大率固定
+    const pageSizeSelector = document.getElementById('pageSize');
+    let pageSize = parseInt(pageSizeSelector.value);
+    let baseScale = 250;
 
     function updateGridColumns() {
       const cols = columnsSelector.value;
