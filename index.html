@@ -59,7 +59,20 @@
 </head>
 <body>
 
-<div class="controls">
+$1
+  <label for="scale">拡大率:</label>
+  <select id="scale">
+    <option value="400">0.57倍（400）</option>
+    <option value="500">0.71倍（500）</option>
+    <option value="600">0.86倍（600）</option>
+    <option value="700" selected>等倍（700）</option>
+    <option value="800">1.14倍（800）</option>
+    <option value="900">1.29倍（900）</option>
+    <option value="1000">1.43倍（1000）</option>
+    <option value="1100">1.57倍（1100）</option>
+    <option value="1200">1.71倍（1200）</option>
+    <option value="1400">2倍（1400）</option>
+  </select>
   <label for="columns">列数:</label>
   <select id="columns">
     <option value="1">1列</option>
@@ -101,6 +114,8 @@
     let data = [];
     let currentPage = 0;
     let pageSize = parseInt(pageSizeSelector.value);
+    const scaleSelector = document.getElementById('scale');
+    let baseScale = parseInt(scaleSelector.value);
 
     function updateGridColumns() {
       const cols = columnsSelector.value;
@@ -109,13 +124,14 @@
     }
 
     function rescaleIframes() {
+      baseScale = parseInt(scaleSelector.value);
       document.querySelectorAll('.iframe-wrapper').forEach(wrapper => {
         const wrapperWidth = wrapper.clientWidth;
         const wrapperHeight = wrapperWidth * 16 / 10;
         wrapper.style.height = `${wrapperHeight}px`;
 
         const iframe = wrapper.querySelector('iframe');
-        const scale = wrapperWidth / 700;
+        const scale = wrapperWidth / baseScale;
         iframe.style.transform = `scale(${scale})`;
       });
     }
@@ -172,6 +188,14 @@
     });
 
     pageSizeSelector.addEventListener('change', () => {
+      pageSize = parseInt(pageSizeSelector.value);
+      currentPage = 0;
+      renderPage(currentPage);
+    });
+
+    scaleSelector.addEventListener('change', () => {
+      baseScale = parseInt(scaleSelector.value);
+      rescaleIframes();
       pageSize = parseInt(pageSizeSelector.value);
       currentPage = 0;
       renderPage(currentPage);
