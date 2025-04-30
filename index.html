@@ -58,6 +58,8 @@
   </style>
 </head>
 <body>
+
+$1
     <label for="columns">列数:</label>
   <select id="columns">
     <option value="1">1列</option>
@@ -72,14 +74,7 @@
     <option value="10">10列</option>
   </select>
 
-  <label for="pageSize">ページサイズ:</label>
-  <select id="pageSize">
-    <option value="10">10件</option>
-    <option value="20" selected>20件</option>
-    <option value="30">30件</option>
-    <option value="50">50件</option>
-  </select>
-
+  
   <button id="prevPage">前へ</button>
   <button id="nextPage">次へ</button>
   <span id="pageInfo"></span>
@@ -91,15 +86,8 @@
   document.addEventListener("DOMContentLoaded", async function() {
     const container = document.querySelector('.grid');
     const columnsSelector = document.getElementById('columns');
-    const pageSizeSelector = document.getElementById('pageSize');
-    const prevButton = document.getElementById('prevPage');
-    const nextButton = document.getElementById('nextPage');
-    const pageInfo = document.getElementById('pageInfo');
-
-    let data = [];
-    let currentPage = 0;
-    let pageSize = parseInt(pageSizeSelector.value);
-    let baseScale = 250;
+    let pageSize = 20;
+    let baseScale = 250; // 拡大率固定
 
     function updateGridColumns() {
       const cols = columnsSelector.value;
@@ -171,11 +159,7 @@
       renderPage(currentPage);
     });
 
-    pageSizeSelector.addEventListener('change', () => {
-      pageSize = parseInt(pageSizeSelector.value);
-      currentPage = 0;
-      renderPage(currentPage);
-    });
+    
 
     
 
