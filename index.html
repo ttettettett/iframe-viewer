@@ -60,14 +60,21 @@
 <body>
 
 $1
-    <label for="columns">列数:</label>
-  <label for="pageSize">ページサイズ:</label>
-  <select id="pageSize">
-    <option value="10">10件</option>
-    <option value="20" selected>20件</option>
-    <option value="30">30件</option>
-    <option value="50">50件</option>
+  <label for="scale">拡大率:</label>
+  <select id="scale">
+    <option value="200">0.29倍（200）</option>
+    <option value="300" selected>0.43倍（300）</option>
+    <option value="400">0.57倍（400）</option>
+    <option value="500">0.71倍（500）</option>
+    <option value="600">0.86倍（600）</option>
+    <option value="700">等倍（700）</option>
+    <option value="800">1.14倍（800）</option>
+    <option value="900">1.29倍（900）</option>
+    <option value="1000">1.43倍（1000）</option>
+    <option value="1100">1.57倍（1100）</option>
+    <option value="1200">1.71倍（1200）</option>
   </select>
+  <label for="columns">列数:</label>
   <select id="columns">
     <option value="1">1列</option>
     <option value="2">2列</option>
@@ -81,7 +88,14 @@ $1
     <option value="10">10列</option>
   </select>
 
-  
+  <label for="pageSize">ページサイズ:</label>
+  <select id="pageSize">
+    <option value="10">10件</option>
+    <option value="20" selected>20件</option>
+    <option value="30">30件</option>
+    <option value="50">50件</option>
+  </select>
+
   <button id="prevPage">前へ</button>
   <button id="nextPage">次へ</button>
   <span id="pageInfo"></span>
@@ -94,8 +108,15 @@ $1
     const container = document.querySelector('.grid');
     const columnsSelector = document.getElementById('columns');
     const pageSizeSelector = document.getElementById('pageSize');
+    const prevButton = document.getElementById('prevPage');
+    const nextButton = document.getElementById('nextPage');
+    const pageInfo = document.getElementById('pageInfo');
+
+    let data = [];
+    let currentPage = 0;
     let pageSize = parseInt(pageSizeSelector.value);
-    let baseScale = 250;
+    const scaleSelector = document.getElementById('scale');
+    let baseScale = parseInt(scaleSelector.value);
 
     function updateGridColumns() {
       const cols = columnsSelector.value;
@@ -167,9 +188,19 @@ $1
       renderPage(currentPage);
     });
 
-    
+    pageSizeSelector.addEventListener('change', () => {
+      pageSize = parseInt(pageSizeSelector.value);
+      currentPage = 0;
+      renderPage(currentPage);
+    });
 
-    
+    scaleSelector.addEventListener('change', () => {
+      baseScale = parseInt(scaleSelector.value);
+      rescaleIframes();
+      pageSize = parseInt(pageSizeSelector.value);
+      currentPage = 0;
+      renderPage(currentPage);
+    });
 
     prevButton.addEventListener('click', () => {
       if (currentPage > 0) {
