@@ -86,36 +86,16 @@
   <button id="nextPage">次へ</button>
   <span id="pageInfo"></span>
 </div>
+
 <div class="grid"></div>
-
-<div class="controls">
-  <button class="paging-button prev">前へ</button>
-  <button class="paging-button next">次へ</button>
-</div>
-
-</div>
 
 <script>
   document.addEventListener("DOMContentLoaded", async function() {
-    const columnsSelector = document.getElementById('columns');
-    const pageSizeSelector = document.getElementById('pageSize');
-    const pageInfo = document.getElementById('pageInfo');
-
-    let data = [];
-    let currentPage = 0;
-    let pageSize = parseInt(pageSizeSelector.value);
-    
-    });
-    
-    });
-    const prevButtonBottom = document.getElementById('prevPageBottom');
-    const nextButtonBottom = document.getElementById('nextPageBottom');
-    const prevButtonBottom = document.getElementById('prevPageBottom');
-    const nextButtonBottom = document.getElementById('nextPageBottom');
     const container = document.querySelector('.grid');
     const columnsSelector = document.getElementById('columns');
     const pageSizeSelector = document.getElementById('pageSize');
-    
+    const prevButton = document.getElementById('prevPage');
+    const nextButton = document.getElementById('nextPage');
     const pageInfo = document.getElementById('pageInfo');
 
     let data = [];
@@ -197,66 +177,21 @@
       renderPage(currentPage);
     });
 
-    
-      }
-    });
-    if (prevButtonBottom) {
-      prevButtonBottom.addEventListener('click', () => {
-        if (currentPage > 0) {
-          currentPage--;
-          renderPage(currentPage);
-        }
-      });
-    }
-    prevButtonBottom.addEventListener('click', () => {
+    prevButton.addEventListener('click', () => {
       if (currentPage > 0) {
         currentPage--;
         renderPage(currentPage);
       }
     });
-        renderPage(currentPage);
-      }
-    });
 
-    
-      }
-    });
-    if (nextButtonBottom) {
-      nextButtonBottom.addEventListener('click', () => {
-        if ((currentPage + 1) * pageSize < data.length) {
-          currentPage++;
-          renderPage(currentPage);
-        }
-      });
-    }
-    nextButtonBottom.addEventListener('click', () => {
+    nextButton.addEventListener('click', () => {
       if ((currentPage + 1) * pageSize < data.length) {
         currentPage++;
         renderPage(currentPage);
       }
     });
-        renderPage(currentPage);
-      }
-    });
 
     window.addEventListener('resize', rescaleIframes);
-
-    document.querySelectorAll('.paging-button.prev').forEach(btn => {
-      btn.addEventListener('click', () => {
-        if (currentPage > 0) {
-          currentPage--;
-          renderPage(currentPage);
-        }
-      });
-    });
-    document.querySelectorAll('.paging-button.next').forEach(btn => {
-      btn.addEventListener('click', () => {
-        if ((currentPage + 1) * pageSize < data.length) {
-          currentPage++;
-          renderPage(currentPage);
-        }
-      });
-    });
 
     const response = await fetch('iframes.csv');
     const text = await response.text();
