@@ -97,6 +97,8 @@
   document.addEventListener("DOMContentLoaded", async function() {
     const prevButtonBottom = document.getElementById('prevPageBottom');
     const nextButtonBottom = document.getElementById('nextPageBottom');
+    const prevButtonBottom = document.getElementById('prevPageBottom');
+    const nextButtonBottom = document.getElementById('nextPageBottom');
     const container = document.querySelector('.grid');
     const columnsSelector = document.getElementById('columns');
     const pageSizeSelector = document.getElementById('pageSize');
@@ -189,6 +191,14 @@
         renderPage(currentPage);
       }
     });
+    if (prevButtonBottom) {
+      prevButtonBottom.addEventListener('click', () => {
+        if (currentPage > 0) {
+          currentPage--;
+          renderPage(currentPage);
+        }
+      });
+    }
     prevButtonBottom.addEventListener('click', () => {
       if (currentPage > 0) {
         currentPage--;
@@ -205,6 +215,14 @@
         renderPage(currentPage);
       }
     });
+    if (nextButtonBottom) {
+      nextButtonBottom.addEventListener('click', () => {
+        if ((currentPage + 1) * pageSize < data.length) {
+          currentPage++;
+          renderPage(currentPage);
+        }
+      });
+    }
     nextButtonBottom.addEventListener('click', () => {
       if ((currentPage + 1) * pageSize < data.length) {
         currentPage++;
