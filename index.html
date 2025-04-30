@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>iframe一覧ページ</title>
+  <title>iframe一覧ページ（ページング対応）</title>
   <style>
     html, body {
       margin: 0;
@@ -73,18 +73,36 @@
     <option value="9">9列</option>
     <option value="10">10列</option>
   </select>
+
+  <label for="pageSize">ページサイズ:</label>
+  <select id="pageSize">
+    <option value="10">10件</option>
+    <option value="20" selected>20件</option>
+    <option value="30">30件</option>
+    <option value="50">50件</option>
+  </select>
+
+  <button id="prevPage">前へ</button>
+  <button id="nextPage">次へ</button>
+  <span id="pageInfo"></span>
 </div>
 
-<div class="grid">
-  <!-- タイトル＋iframeを後から読み込み -->
-</div>
+<div class="grid"></div>
 
 <script>
   document.addEventListener("DOMContentLoaded", async function() {
     const container = document.querySelector('.grid');
     const columnsSelector = document.getElementById('columns');
+    const pageSizeSelector = document.getElementById('pageSize');
+    const prevButton = document.getElementById('prevPage');
+    const nextButton = document.getElementById('nextPage');
+    const pageInfo = document.getElementById('pageInfo');
 
-    function updateGrid() {
+    let data = [];
+    let currentPage = 0;
+    let pageSize = parseInt(pageSizeSelector.value);
+
+    function updateGridColumns() {
       const cols = columnsSelector.value;
       container.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
       rescaleIframes();
@@ -102,19 +120,7 @@
       });
     }
 
-    columnsSelector.addEventListener('change', updateGrid);
-    window.addEventListener('resize', rescaleIframes);
-
-    const response = await fetch('iframes.csv');
-    const text = await response.text();
-
-    const lines = text.trim().split(/\r?\n/);
-    const data = lines.slice(1).map(line => {
-      const [title, url] = line.split(",");
-      return { title: title.trim(), url: url.trim() };
-    });
-
-    data.forEach(item => {
+    function appendIframe(item) {
       const div = document.createElement('div');
       div.className = 'item';
 
@@ -127,28 +133,76 @@
 
       const iframe = document.createElement('iframe');
       iframe.setAttribute('data-src', item.url);
+      iframe.setAttribute('loading', 'lazy');
 
       wrapper.appendChild(iframe);
       div.appendChild(title);
       div.appendChild(wrapper);
       container.appendChild(div);
-    });
+    }
 
-    const observer = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const iframe = entry.target;
-          iframe.src = iframe.dataset.src;
-          observer.unobserve(iframe);
-        }
+    function observeIframes() {
+      const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const iframe = entry.target;
+            iframe.src = iframe.dataset.src;
+            observer.unobserve(iframe);
+          }
+        });
+      }, { rootMargin: "200px" });
+
+      document.querySelectorAll('iframe[data-src]').forEach(iframe => {
+        if (!iframe.src) observer.observe(iframe);
       });
-    }, { rootMargin: "100px" });
+    }
 
-    document.querySelectorAll('iframe[data-src]').forEach(iframe => {
-      observer.observe(iframe);
+    function renderPage(page) {
+      container.innerHTML = '';
+      const items = data.slice(page * pageSize, (page + 1) * pageSize);
+      items.forEach(item => appendIframe(item));
+      rescaleIframes();
+      observeIframes();
+      pageInfo.textContent = `ページ ${page + 1} / ${Math.ceil(data.length / pageSize)}`;
+    }
+
+    columnsSelector.addEventListener('change', () => {
+      updateGridColumns();
+      renderPage(currentPage);
     });
 
-    updateGrid();
+    pageSizeSelector.addEventListener('change', () => {
+      pageSize = parseInt(pageSizeSelector.value);
+      currentPage = 0;
+      renderPage(currentPage);
+    });
+
+    prevButton.addEventListener('click', () => {
+      if (currentPage > 0) {
+        currentPage--;
+        renderPage(currentPage);
+      }
+    });
+
+    nextButton.addEventListener('click', () => {
+      if ((currentPage + 1) * pageSize < data.length) {
+        currentPage++;
+        renderPage(currentPage);
+      }
+    });
+
+    window.addEventListener('resize', rescaleIframes);
+
+    const response = await fetch('iframes.csv');
+    const text = await response.text();
+    const lines = text.trim().split(/\r?\n/);
+    data = lines.slice(1).map(line => {
+      const [title, url] = line.split(',');
+      return { title: title.trim(), url: url.trim() };
+    });
+
+    updateGridColumns();
+    renderPage(0);
   });
 </script>
 
