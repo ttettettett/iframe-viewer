@@ -97,21 +97,16 @@
 
 <script>
   document.addEventListener("DOMContentLoaded", async function() {
-    document.querySelectorAll('.paging-button.prev').forEach(btn => {
-      btn.addEventListener('click', () => {
-        if (currentPage > 0) {
-          currentPage--;
-          renderPage(currentPage);
-        }
-      });
+    const columnsSelector = document.getElementById('columns');
+    const pageSizeSelector = document.getElementById('pageSize');
+    const pageInfo = document.getElementById('pageInfo');
+
+    let data = [];
+    let currentPage = 0;
+    let pageSize = parseInt(pageSizeSelector.value);
+    
     });
-    document.querySelectorAll('.paging-button.next').forEach(btn => {
-      btn.addEventListener('click', () => {
-        if ((currentPage + 1) * pageSize < data.length) {
-          currentPage++;
-          renderPage(currentPage);
-        }
-      });
+    
     });
     const prevButtonBottom = document.getElementById('prevPageBottom');
     const nextButtonBottom = document.getElementById('nextPageBottom');
@@ -245,6 +240,23 @@
     });
 
     window.addEventListener('resize', rescaleIframes);
+
+    document.querySelectorAll('.paging-button.prev').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (currentPage > 0) {
+          currentPage--;
+          renderPage(currentPage);
+        }
+      });
+    });
+    document.querySelectorAll('.paging-button.next').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if ((currentPage + 1) * pageSize < data.length) {
+          currentPage++;
+          renderPage(currentPage);
+        }
+      });
+    });
 
     const response = await fetch('iframes.csv');
     const text = await response.text();
