@@ -116,8 +116,10 @@
         <div id="output"></div>
     </div>
 
+    <!-- 必ずここに追加 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/papaparse/5.3.0/papaparse.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pivottable/2.23.0/pivot.min.js"></script>
+
     <script>
         const output = document.getElementById('output');
         const startDateInput = document.getElementById('startDate');
@@ -146,30 +148,7 @@
             })
             .catch(error => alert("[ERROR] CSVファイルの読み込みに失敗しました: " + error));
 
-        // === フィルターの適用 ===
-        function applyFilter() {
-            alert("[DEBUG] フィルター処理開始");
-            const selectedDays = Array.from(daySelector.selectedOptions).map(option => option.value);
-            const startDate = new Date(startDateInput.value);
-            const endDate = new Date(endDateInput.value);
-
-            const filteredData = originalData.filter(row => {
-                const date = new Date(row["日付"]);
-                alert("[DEBUG] 日付パース結果: " + date);
-
-                const day = date.getDate().toString().padStart(2, '0');
-                const inRange = (!isNaN(startDate) ? date >= startDate : true) &&
-                                (!isNaN(endDate) ? date <= endDate : true);
-
-                const inDays = selectedDays.length === 0 || selectedDays.includes(day);
-
-                return inRange && inDays;
-            });
-
-            alert("[DEBUG] フィルター後のデータ数: " + filteredData.length);
-            renderTable(filteredData);
-        }
-
+        // === ピボットテーブル描画 ===
         function renderTable(data) {
             output.innerHTML = "";
             $(output).pivotUI(data, {
