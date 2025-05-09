@@ -26,30 +26,8 @@
             margin-bottom: 20px;
         }
 
-        #hallSelector {
-            display: block;
-            margin: 10px auto 20px auto;
-        }
-
-        #filterSection {
-            margin-bottom: 20px;
-            display: flex;
-            gap: 10px;
-        }
-
         #output {
             margin-top: 20px;
-        }
-
-        #daySelector {
-            height: auto;
-            max-width: 150px;
-            overflow-y: auto;
-        }
-
-        button {
-            height: 40px;
-            margin-top: 10px;
         }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pivottable/2.23.0/pivot.min.css">
@@ -57,80 +35,20 @@
 <body>
     <div class="container">
         <h2>マルハン蒲田駅東店 ピボットテーブル</h2>
-        
-        <!-- セレクトボックス -->
-        <select id="hallSelector">
-            <option value="マルハン蒲田駅東店" selected>マルハン蒲田駅東店</option>
-        </select>
-
-        <!-- フィルタリングセクション -->
-        <div id="filterSection">
-            <div>
-                <label>日付範囲:</label>
-                <input type="date" id="startDate">
-                〜
-                <input type="date" id="endDate">
-            </div>
-
-            <div>
-                <label>複数日付選択:</label>
-                <select id="daySelector" multiple size="5">
-                    <option value="01">1日</option>
-                    <option value="02">2日</option>
-                    <option value="03">3日</option>
-                    <option value="04">4日</option>
-                    <option value="05">5日</option>
-                    <option value="06">6日</option>
-                    <option value="07">7日</option>
-                    <option value="08">8日</option>
-                    <option value="09">9日</option>
-                    <option value="10">10日</option>
-                    <option value="11">11日</option>
-                    <option value="12">12日</option>
-                    <option value="13">13日</option>
-                    <option value="14">14日</option>
-                    <option value="15">15日</option>
-                    <option value="16">16日</option>
-                    <option value="17">17日</option>
-                    <option value="18">18日</option>
-                    <option value="19">19日</option>
-                    <option value="20">20日</option>
-                    <option value="21">21日</option>
-                    <option value="22">22日</option>
-                    <option value="23">23日</option>
-                    <option value="24">24日</option>
-                    <option value="25">25日</option>
-                    <option value="26">26日</option>
-                    <option value="27">27日</option>
-                    <option value="28">28日</option>
-                    <option value="29">29日</option>
-                    <option value="30">30日</option>
-                    <option value="31">31日</option>
-                </select>
-            </div>
-
-            <button onclick="applyFilter()">適用</button>
-        </div>
-
-        <!-- ピボットテーブル出力 -->
         <div id="output"></div>
     </div>
 
-    <!-- 必ずここに追加 -->
+    <!-- 必要なスクリプト -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/papaparse/5.3.0/papaparse.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pivottable/2.23.0/pivot.min.js"></script>
 
     <script>
         const output = document.getElementById('output');
-        const startDateInput = document.getElementById('startDate');
-        const endDateInput = document.getElementById('endDate');
-        const daySelector = document.getElementById('daySelector');
+        const fileName = `./差枚数/マルハン蒲田駅東店.csv`;
 
         let originalData = [];
 
-        // === 初期表示で読み込み ===
-        const fileName = `./差枚数/マルハン蒲田駅東店.csv`;
-
+        // === CSVの読み込み ===
         fetch(fileName)
             .then(response => {
                 alert("[DEBUG] CSVの取得成功");
@@ -139,10 +57,17 @@
             .then(csvData => {
                 Papa.parse(csvData, {
                     header: true,
+                    skipEmptyLines: true,
                     complete: function(results) {
                         originalData = results.data;
                         alert("[DEBUG] CSVパース成功\n" + JSON.stringify(originalData.slice(0, 3), null, 2));
-                        renderTable(originalData);
+
+                        if (originalData.length === 0) {
+                            alert("[ERROR] データが空です。CSVの内容を確認してください。");
+                        } else {
+                            alert("[DEBUG] 1行目の内容: " + JSON.stringify(originalData[0]));
+                            renderTable(originalData);
+                        }
                     }
                 });
             })
