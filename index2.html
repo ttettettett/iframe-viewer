@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>パチンコデータピボットテーブル（差枚数フォルダ対応）</title>
+    <title>マルハン蒲田駅東店 ピボットテーブル</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -26,7 +26,7 @@
             margin-bottom: 20px;
         }
 
-        #fileSelector, #hallSelector, #filterSection {
+        #hallSelector {
             display: block;
             margin: 10px auto 20px auto;
         }
@@ -34,114 +34,52 @@
         #output {
             margin-top: 20px;
         }
-
-        .filter-label {
-            margin-right: 10px;
-        }
-
-        #daySelector {
-            width: 100%;
-            height: 150px;
-        }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pivottable/2.23.0/pivot.min.css">
 </head>
 <body>
     <div class="container">
-        <h2>パチンコデータピボットテーブル（差枚数フォルダ対応）</h2>
-        <select id="fileSelector">
-            <option value="" disabled selected>ファイルを選択してください</option>
-        </select>
+        <h2>マルハン蒲田駅東店 ピボットテーブル</h2>
         <select id="hallSelector">
             <option value="" disabled selected>ホールを選択してください</option>
+            <option value="マルハン蒲田駅東店">マルハン蒲田駅東店</option>
         </select>
-
-        <div id="filterSection">
-            <label class="filter-label">開始日: <input type="date" id="startDate"></label>
-            <label class="filter-label">終了日: <input type="date" id="endDate"></label>
-            <div>
-                <select id="daySelector" multiple>
-                    <option value="01">1日</option>
-                    <option value="02">2日</option>
-                    <option value="03">3日</option>
-                    <option value="04">4日</option>
-                    <option value="05">5日</option>
-                    <option value="06">6日</option>
-                    <option value="07">7日</option>
-                    <option value="08">8日</option>
-                    <option value="09">9日</option>
-                    <option value="10">10日</option>
-                    <option value="11">11日</option>
-                    <option value="12">12日</option>
-                    <option value="13">13日</option>
-                    <option value="14">14日</option>
-                    <option value="15">15日</option>
-                    <option value="16">16日</option>
-                    <option value="17">17日</option>
-                    <option value="18">18日</option>
-                    <option value="19">19日</option>
-                    <option value="20">20日</option>
-                    <option value="21">21日</option>
-                    <option value="22">22日</option>
-                    <option value="23">23日</option>
-                    <option value="24">24日</option>
-                    <option value="25">25日</option>
-                    <option value="26">26日</option>
-                    <option value="27">27日</option>
-                    <option value="28">28日</option>
-                    <option value="29">29日</option>
-                    <option value="30">30日</option>
-                    <option value="31">31日</option>
-                </select>
-            </div>
-            <button onclick="applyFilter()">適用</button>
-        </div>
-
         <div id="output"></div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/papaparse/5.3.0/papaparse.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pivottable/2.23.0/pivot.min.js"></script>
     <script>
-        const fileSelector = document.getElementById('fileSelector');
         const hallSelector = document.getElementById('hallSelector');
-        const daySelector = document.getElementById('daySelector');
-        let allData = [];
-        let filteredData = [];
+        const output = document.getElementById('output');
 
-        // === 差枚数フォルダのファイル一覧を取得 ===
-        fetch('/差枚数/')
-            .then(response => response.json())
-            .then(files => {
-                files.forEach(file => {
-                    if (file.endsWith(".csv")) {
-                        fileSelector.innerHTML += `<option value="${file}">${file}</option>`;
-                    }
-                });
-            })
-            .catch(error => console.error("[ERROR] ファイル一覧の取得に失敗しました:", error));
+        // === ホール選択後の処理 ===
+        hallSelector.addEventListener('change', (event) => {
+            const selectedHall = event.target.value;
+            const fileName = `./差枚数/${selectedHall}.csv`;
 
-        // === ファイル選択後の処理 ===
-        fileSelector.addEventListener('change', (event) => {
-            const fileName = event.target.value;
-            fetch(`/差枚数/${fileName}`)
+            console.log(`[INFO] ${selectedHall} のデータを取得中...`);
+            
+            fetch(fileName)
                 .then(response => response.text())
                 .then(csvData => {
                     Papa.parse(csvData, {
                         header: true,
                         complete: function(results) {
-                            allData = results.data;
+                            const data = results.data;
 
-                            // === ホール名の抽出とセレクトボックス更新 ===
-                            const halls = [...new Set(allData.map(row => row["ホール名"]))];
-                            hallSelector.innerHTML = `<option value="" disabled selected>ホールを選択してください</option>`;
-                            halls.forEach(hall => {
-                                hallSelector.innerHTML += `<option value="${hall}">${hall}</option>`;
+                            output.innerHTML = "";
+                            $(output).pivotUI(data, {
+                                rows: ["日付"],
+                                cols: ["機種名"],
+                                aggregatorName: "Average",
+                                vals: ["差枚数"],
+                                rendererName: "Heatmap"
                             });
                         }
                     });
                 })
-                .catch(error => console.error("[ERROR] ファイルの読み込みに失敗しました:", error));
+                .catch(error => console.error("[ERROR] CSVファイルの読み込みに失敗しました:", error));
         });
     </script>
 </body>
