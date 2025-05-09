@@ -31,6 +31,10 @@
             margin: 10px auto 20px auto;
         }
 
+        #filterSection {
+            margin-bottom: 20px;
+        }
+
         #output {
             margin-top: 20px;
         }
@@ -40,10 +44,23 @@
 <body>
     <div class="container">
         <h2>マルハン蒲田駅東店 ピボットテーブル</h2>
+        
+        <!-- セレクトボックス -->
         <select id="hallSelector">
             <option value="" disabled selected>ホールを選択してください</option>
             <option value="マルハン蒲田駅東店">マルハン蒲田駅東店</option>
         </select>
+
+        <!-- フィルタリングセクション -->
+        <div id="filterSection">
+            <label>日付範囲: </label>
+            <input type="date" id="startDate">
+            〜
+            <input type="date" id="endDate">
+            <button onclick="applyFilter()">適用</button>
+        </div>
+
+        <!-- ピボットテーブル出力 -->
         <div id="output"></div>
     </div>
 
@@ -52,6 +69,10 @@
     <script>
         const hallSelector = document.getElementById('hallSelector');
         const output = document.getElementById('output');
+        const startDateInput = document.getElementById('startDate');
+        const endDateInput = document.getElementById('endDate');
+
+        let originalData = [];
 
         // === ホール選択後の処理 ===
         hallSelector.addEventListener('change', (event) => {
@@ -66,10 +87,10 @@
                     Papa.parse(csvData, {
                         header: true,
                         complete: function(results) {
-                            const data = results.data;
+                            originalData = results.data;
 
                             output.innerHTML = "";
-                            $(output).pivotUI(data, {
+                            $(output).pivotUI(originalData, {
                                 rows: ["日付"],
                                 cols: ["機種名"],
                                 aggregatorName: "Average",
@@ -81,6 +102,27 @@
                 })
                 .catch(error => console.error("[ERROR] CSVファイルの読み込みに失敗しました:", error));
         });
+
+        // === 日付フィルターの適用 ===
+        function applyFilter() {
+            const startDate = new Date(startDateInput.value);
+            const endDate = new Date(endDateInput.value);
+
+            const filteredData = originalData.filter(row => {
+                const date = new Date(row["日付"]);
+                return (!isNaN(startDate) ? date >= startDate : true) &&
+                       (!isNaN(endDate) ? date <= endDate : true);
+            });
+
+            output.innerHTML = "";
+            $(output).pivotUI(filteredData, {
+                rows: ["日付"],
+                cols: ["機種名"],
+                aggregatorName: "Average",
+                vals: ["差枚数"],
+                rendererName: "Heatmap"
+            });
+        }
     </script>
 </body>
 </html>
