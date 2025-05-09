@@ -48,9 +48,16 @@
 
         let originalData = [];
 
+        // === ファイルパスの確認 ===
+        alert(`[DEBUG] 試行中のパス: ${fileName}`);
+
         // === CSVの読み込み ===
         fetch(fileName)
             .then(response => {
+                if (!response.ok) {
+                    alert("[ERROR] ファイルが見つかりませんでした。パスを確認してください。");
+                    throw new Error("ファイルが見つかりません");
+                }
                 alert("[DEBUG] CSVの取得成功");
                 return response.text();
             })
